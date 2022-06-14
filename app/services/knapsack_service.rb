@@ -1,2 +1,2 @@
-class KnapsackService
+module KnapsackService
 end
