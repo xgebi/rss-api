@@ -39,7 +39,6 @@
     <orderEntry type="library" scope="PROVIDED" name="activestorage (v7.0.3, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="activesupport (v7.0.3, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="addressable (v2.8.0, ruby-3.1.2-p20) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="argon2 (v2.1.1, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ast (v2.4.2, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bcrypt (v3.1.18, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bindex (v0.8.1, ruby-3.1.2-p20) [gem]" level="application" />
@@ -56,12 +55,9 @@
     <orderEntry type="library" scope="PROVIDED" name="digest (v3.1.0, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="erubi (v1.10.0, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="et-orbi (v1.2.7, ruby-3.1.2-p20) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="ffi (v1.15.5, ruby-3.1.2-p20) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="ffi-compiler (v1.0.1, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="fugit (v1.5.3, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="globalid (v1.0.0, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="good_job (v2.15.1, ruby-3.1.2-p20) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="has_secure_password_argon2 (v1.0.0, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="i18n (v1.10.0, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="io-console (v0.5.11, ruby-3.1.2-p20) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="irb (v1.4.1, ruby-3.1.2-p20) [gem]" level="application" />

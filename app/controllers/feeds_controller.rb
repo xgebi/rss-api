@@ -1,9 +1,9 @@
 class FeedsController < ApplicationController
-  before_action :set_feed, only: %i[ show edit update destroy ]
+  before_action :authenticate_user!, :set_feed, only: %i[ show edit update destroy ]
 
   # GET /feeds or /feeds.json
   def index
-    @feeds = Feed.all
+    @feeds = User.feeds
   end
 
   # GET /feeds/1 or /feeds/1.json

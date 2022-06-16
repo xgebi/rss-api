@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     resources :posts
     resources :feeds
     resources :users
+    post '/current-user', to: 'users#getUserByToken'
     post '/authenticate', to: 'session#authenticate'
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
