@@ -3,7 +3,10 @@ class FeedsController < ApplicationController
 
   # GET /feeds or /feeds.json
   def index
-    @feeds = current_user.feeds
+    @feeds = Feed.all
+    @feeds = @feeds.where(user_id: current_user.id)
+    p @feeds
+    render json: @feeds, each_serializer: FeedSerializer
   end
 
   # GET /feeds/1 or /feeds/1.json

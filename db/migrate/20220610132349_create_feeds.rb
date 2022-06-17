@@ -5,7 +5,6 @@ class CreateFeeds < ActiveRecord::Migration[7.0]
       t.string :title
       t.string :uri
       t.text :description
-      t.boolean :read
       t.datetime :added
       t.timestamps
     end
