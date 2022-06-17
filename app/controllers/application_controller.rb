@@ -2,15 +2,14 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :null_session
 
   def current_user
-    if request.headers['Authorization']
-      token = request.headers['Authorization'].split(' ')[1]
-      if token
-        token_service = TokenService.new
-        payload = token_service.decode(token)
-        byebug
-        @current_user ||= User.find_by(id: payload[0]['id'])
-      end
-    end
+    return unless request.headers['Authorization']
+
+    token = request.headers['Authorization'].split(' ')[1]
+    return unless token
+
+    token_service = TokenService.new
+    payload = token_service.decode(token)
+    @current_user ||= User.find_by(id: payload[0]['id']) # TODO this shall be redone a bit
   end
 
   def logged_in?
