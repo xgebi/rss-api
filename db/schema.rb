@@ -15,22 +15,24 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_10_162002) do
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
-  create_table "feed_users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.bigint "users_id"
-    t.bigint "feeds_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["feeds_id"], name: "index_feed_users_on_feeds_id"
-    t.index ["users_id"], name: "index_feed_users_on_users_id"
+  create_table "article_content", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "post_id"
+    t.string "title"
+    t.string "uri"
+    t.text "content"
+    t.index ["post_id"], name: "index_article_content_on_post_id"
   end
 
   create_table "feeds", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id"
     t.string "title"
     t.string "uri"
     t.text "description"
+    t.boolean "read"
     t.datetime "added"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_feeds_on_user_id"
   end
 
   create_table "good_job_processes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -65,23 +67,12 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_10_162002) do
   end
 
   create_table "posts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "title"
-    t.string "uri"
-    t.text "content"
+    t.uuid "feed_id"
     t.datetime "added"
     t.datetime "updated"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "user_posts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.bigint "users_id"
-    t.bigint "posts_id"
-    t.boolean "read"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["posts_id"], name: "index_user_posts_on_posts_id"
-    t.index ["users_id"], name: "index_user_posts_on_users_id"
+    t.index ["feed_id"], name: "index_posts_on_feed_id"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -92,4 +83,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_10_162002) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "article_content", "posts"
+  add_foreign_key "feeds", "users"
+  add_foreign_key "posts", "feeds"
 end

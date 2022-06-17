@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
 
     token_service = TokenService.new
     payload = token_service.decode(token)
-    @current_user ||= User.find_by(id: payload[0]['id']) # TODO this shall be redone a bit
+    @current_user ||= User.find_by(id: payload[0]['data']['id']) # TODO this shall be redone a bit
   end
 
   def logged_in?
