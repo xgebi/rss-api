@@ -1,25 +1,17 @@
 class FeedsController < ApplicationController
-  before_action :authenticate_user!, :set_feed, only: %i[ show edit update destroy ]
+  before_action :authenticate_user!, :set_feed, only: %i[show update destroy]
 
   # GET /feeds or /feeds.json
   def index
     @feeds = Feed.all
     @feeds = @feeds.where(user_id: current_user.id)
-    p @feeds
     render json: @feeds, each_serializer: FeedSerializer
   end
 
   # GET /feeds/1 or /feeds/1.json
   def show
-  end
-
-  # GET /feeds/new
-  def new
-    @feed = Feed.new
-  end
-
-  # GET /feeds/1/edit
-  def edit
+    @feeds = Feed.find_by(id: params[:id])
+    render json: @feeds, serializer: FeedSerializer
   end
 
   # POST /feeds or /feeds.json
