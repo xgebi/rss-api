@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   scope 'api' do
     resources :posts
-    resources :feeds
+    resources :feed
     resources :users
     post '/current-user', to: 'users#getUserByToken'
     post '/authenticate', to: 'session#authenticate'
