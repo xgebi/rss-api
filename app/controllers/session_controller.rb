@@ -3,8 +3,7 @@ class SessionController < ApplicationController
     @user = User.find_by(username: request.params[:username])
     if @user&.authenticate(request.params[:password])
       token = { id: @user[:id], username: @user[:username] }
-      token_service = TokenService.new
-      render json: { name: @user[:username], id: @user[:id], token: token_service.encode(token) }
+      render json: { name: @user[:username], id: @user[:id], token: TokenService::encode(token) }
     else
       render json: {
         status: 401,

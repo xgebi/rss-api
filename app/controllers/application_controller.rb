@@ -7,8 +7,7 @@ class ApplicationController < ActionController::Base
     token = request.headers['Authorization'].split(' ')[1]
     return unless token
 
-    token_service = TokenService.new
-    payload = token_service.decode(token)
+    payload = TokenService::decode(token)
     @current_user ||= User.find_by(id: payload[0]['data']['id']) # TODO: this shall be redone a bit
   end
 
