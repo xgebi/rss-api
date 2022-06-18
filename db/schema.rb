@@ -10,17 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_18_133154) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_18_163545) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
-  create_table "article_content", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "post_id"
+  create_table "article_contents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "title"
-    t.string "uri"
+    t.string "guid"
     t.text "content"
-    t.index ["post_id"], name: "index_article_content_on_post_id"
+    t.string "description"
+    t.string "pub_date"
+    t.string "media_link"
+    t.integer "itunes_duration"
+    t.string "itunes_summary"
+    t.string "link"
   end
 
   create_table "feeds", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -31,7 +35,9 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_18_133154) do
     t.datetime "added"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "type", default: "article"
+    t.string "feed_type", default: "article"
+    t.string "updatePeriod"
+    t.integer "updateFrequency"
     t.index ["user_id"], name: "index_feeds_on_user_id"
   end
 
@@ -68,11 +74,13 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_18_133154) do
 
   create_table "posts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "feed_id"
+    t.uuid "article_content_id"
     t.datetime "added"
     t.datetime "updated"
     t.boolean "read"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["article_content_id"], name: "index_posts_on_article_content_id"
     t.index ["feed_id"], name: "index_posts_on_feed_id"
   end
 
@@ -84,7 +92,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_18_133154) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "article_content", "posts"
   add_foreign_key "feeds", "users"
+  add_foreign_key "posts", "article_contents"
   add_foreign_key "posts", "feeds"
 end
