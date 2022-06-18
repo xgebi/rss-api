@@ -1,7 +1,7 @@
 class FeedController < ApplicationController
   before_action :authenticate_user!, :set_feed, only: %i[show update destroy]
 
-  # GET /feed or /feed.json
+  # GET /feed.json
   # # TODO: paginated list, for the first iteration this is ok
   def index
     @feeds = Feed.all
@@ -9,7 +9,7 @@ class FeedController < ApplicationController
     render json: @feeds, each_serializer: FeedSerializer
   end
 
-  # GET /feed/1 or /feed/1.json
+  # GET /feed/1.json
   def show
     @feed = Feed.find_by(id: params[:id])
     render json: @feed, serializer: FeedSerializer
@@ -30,25 +30,23 @@ class FeedController < ApplicationController
     end
   end
 
-  # PATCH/PUT /feed/1 or /feed/1.json
+  # PATCH/PUT /feed/1.json
   def update
     permitted_params = feed_params.permit(:description, :title, :uri)
     respond_to do |format|
       if @feed.update(permitted_params)
         format.json { render json: @feed, serializer: FeedSerializer }
       else
-        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @feed.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # DELETE /feed/1 or /feed/1.json
+  # DELETE /feed/1.json
   def destroy
     @feed.destroy
 
     respond_to do |format|
-      format.html { redirect_to feeds_url, notice: "Feed was successfully destroyed." }
       format.json { head :no_content }
     end
   end
