@@ -73,3 +73,4 @@ gem 'jwt'
 
 gem 'httparty'
 gem 'nokogiri'
+gem "validate_url"

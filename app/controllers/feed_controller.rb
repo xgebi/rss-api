@@ -18,7 +18,6 @@ class FeedController < ApplicationController
   # POST /feed or /feed.json
   def create
     permitted_params = feed_params.permit(:description, :title, :uri)
-    byebug
     @feed = Feed.new(permitted_params)
     @feed.user = current_user
 
