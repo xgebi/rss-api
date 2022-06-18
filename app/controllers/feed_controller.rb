@@ -17,14 +17,15 @@ class FeedController < ApplicationController
 
   # POST /feed or /feed.json
   def create
-    @feed = Feed.new(feed_params)
+    permitted_params = feed_params.permit(:description, :title, :uri)
+    byebug
+    @feed = Feed.new(permitted_params)
+    @feed.user = current_user
 
     respond_to do |format|
       if @feed.save
-        format.html { redirect_to feed_url(@feed), notice: "Feed was successfully created." }
-        format.json { render :show, status: :created, location: @feed }
+        format.json { render json: @feed, serializer: FeedSerializer }
       else
-        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @feed.errors, status: :unprocessable_entity }
       end
     end

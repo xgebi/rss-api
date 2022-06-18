@@ -70,3 +70,6 @@ gem 'rack-cors'
 gem 'active_model_serializers'
 
 gem 'jwt'
+
+gem 'httparty'
+gem 'nokogiri'
