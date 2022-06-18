@@ -3,6 +3,7 @@ class PostController < ApplicationController
 
   # GET /post or /post.json
   def index
+    # TODO pagination
     @posts = Post.all
   end
 
@@ -58,7 +59,9 @@ class PostController < ApplicationController
   end
 
   def refresh_posts
-
+    # TODO pagination
+    pfs = ProcessFeedService.new
+    pfs.process_articles
   end
 
   private
