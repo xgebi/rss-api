@@ -2,18 +2,17 @@ class FeedController < ApplicationController
   before_action :authenticate_user!, :set_feed, only: %i[show update destroy]
 
   # GET /feed or /feed.json
+  # # TODO: paginated list, for the first iteration this is ok
   def index
     @feeds = Feed.all
     @feeds = @feeds.where(user_id: current_user.id)
     render json: @feeds, each_serializer: FeedSerializer
   end
 
-  # TODO: paginated list, for the first iteration this is ok
-
   # GET /feed/1 or /feed/1.json
   def show
-    @feeds = Feed.find_by(id: params[:id])
-    render json: @feeds, serializer: FeedSerializer
+    @feed = Feed.find_by(id: params[:id])
+    render json: @feed, serializer: FeedSerializer
   end
 
   # POST /feed or /feed.json
@@ -33,10 +32,10 @@ class FeedController < ApplicationController
 
   # PATCH/PUT /feed/1 or /feed/1.json
   def update
+    permitted_params = feed_params.permit(:description, :title, :uri)
     respond_to do |format|
-      if @feed.update(feed_params)
-        format.html { redirect_to feed_url(@feed), notice: "Feed was successfully updated." }
-        format.json { render :show, status: :ok, location: @feed }
+      if @feed.update(permitted_params)
+        format.json { render json: @feed, serializer: FeedSerializer }
       else
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @feed.errors, status: :unprocessable_entity }
