@@ -1,10 +1,12 @@
 Rails.application.routes.draw do
   scope 'api' do
-    resources :posts
+    resources :post
     resources :feed
     resources :users
     post '/current-user', to: 'users#getUserByToken'
     post '/authenticate', to: 'session#authenticate'
+
+    get '/post/refresh', to: 'post#refresh_posts'
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

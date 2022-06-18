@@ -66,7 +66,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_10_162002) do
     t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
   end
 
-  create_table "posts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "post", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "feed_id"
     t.datetime "added"
     t.datetime "updated"
@@ -83,7 +83,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_10_162002) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "article_content", "posts"
+  add_foreign_key "article_content", "post"
   add_foreign_key "feeds", "users"
-  add_foreign_key "posts", "feeds"
+  add_foreign_key "post", "feeds"
 end
