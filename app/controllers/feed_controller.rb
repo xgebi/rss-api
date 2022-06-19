@@ -17,30 +17,27 @@ class FeedController < ApplicationController
 
   # POST /feed or /feed.json
   def create
-    permitted_params = feed_params.permit(:description, :title, :uri)
+    permitted_params = feed_params.permit(:description, :title, :uri, :feed_type)
     permitted_params[:uri] = format_feed_uri feed_params
     @feed = Feed.new(permitted_params)
     @feed.user = current_user
 
-    respond_to do |format|
-      if @feed.save
-        format.json { render json: @feed, serializer: FeedSerializer }
-      else
-        format.json { render json: @feed.errors, status: :unprocessable_entity }
-      end
+    if @feed.save
+      render json: @feed, serializer: FeedSerializer
+    else
+      render json: @feed.errors, status: :unprocessable_entity
     end
   end
 
   # PATCH/PUT /feed/1.json
   def update
-    permitted_params = feed_params.permit(:description, :title, :uri)
+    permitted_params = feed_params.permit(:description, :title, :uri, :feed_type)
     permitted_params[:uri] = format_feed_uri permitted_params
-    respond_to do |format|
-      if @feed.update(permitted_params)
-        format.json { render json: @feed, serializer: FeedSerializer }
-      else
-        format.json { render json: @feed.errors, status: :unprocessable_entity }
-      end
+
+    if @feed.update(permitted_params)
+      format.json { render json: @feed, serializer: FeedSerializer }
+    else
+      format.json { render json: @feed.errors, status: :unprocessable_entity }
     end
   end
 
@@ -48,9 +45,7 @@ class FeedController < ApplicationController
   def destroy
     @feed.destroy
 
-    respond_to do |format|
-      format.json { head :no_content }
-    end
+    format.json { head :no_content }
   end
 
   private

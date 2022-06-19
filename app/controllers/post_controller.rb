@@ -25,24 +25,21 @@ class PostController < ApplicationController
   def create
     @post = Post.new(post_params)
 
-    respond_to do |format|
-      if @post.save
-        render json: @post, serializer: PostSerializer, status: :created
-      else
-        render json: @post.errors, status: :unprocessable_entity
-      end
+    if @post.save
+      render json: @post, serializer: PostSerializer, status: :created
+    else
+      render json: @post.errors, status: :unprocessable_entity
     end
   end
 
   # PATCH/PUT /post/1.json
   def update
     permitted_params = post_params.permit(:read)
-    respond_to do |format|
-      if @post.update(permitted_params)
-        render json: @post, serializer: PostSerializer, status: :ok
-      else
-        render json: @post.errors, status: :unprocessable_entity
-      end
+    byebug
+    if @post.update(permitted_params)
+      render json: @post, serializer: PostSerializer, status: :ok
+    else
+      render json: @post.errors, status: :unprocessable_entity
     end
   end
 
@@ -50,16 +47,13 @@ class PostController < ApplicationController
   def destroy
     @post.destroy
 
-    respond_to do |format|
-      format.html { redirect_to posts_url, notice: "Post was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    format.json { head :no_content }
   end
 
   def refresh_posts
     pfs = ProcessFeedService.new(current_user)
     pfs.process_articles if params[:type] == 'articles'
-    pfs.process_podcasts if params[:type] == 'podcasts'
+    pfs.process_podcasts if params[:type] == 'episode'
     get_posts
   end
 

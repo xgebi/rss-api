@@ -44,7 +44,8 @@ class ProcessFeedService
         feed:,
         read: false,
         article_content:,
-        user: feed.user
+        user: feed.user,
+        post_type: feed.feed_type
       )
       post.save!
     end
@@ -85,10 +86,10 @@ class ProcessFeedService
         guid: item.at_css('guid').content,
         title: item.at_css('title').content,
         description: item.at_css('description').content,
-        media_link: item.at_css('enclosure').content,
+        media_link: item.at_css('enclosure')['url'],
         itunes_duration: item.at_css('itunes|duration').content,
         itunes_summary: item.at_css('itunes|summary').content,
-        content: item.at_css('content|encoded').content,
+        content: item.at_css('content|encoded')&.content,
         pub_date: item.at_css('pubDate').content,
         link: item.at_css('link').content
       )
