@@ -17,8 +17,8 @@ class FeedController < ApplicationController
 
   # POST /feed or /feed.json
   def create
-    format_feed_uri feed_params
     permitted_params = feed_params.permit(:description, :title, :uri)
+    permitted_params[:uri] = format_feed_uri feed_params
     @feed = Feed.new(permitted_params)
     @feed.user = current_user
 
@@ -33,9 +33,8 @@ class FeedController < ApplicationController
 
   # PATCH/PUT /feed/1.json
   def update
-    feed_params[:uri] = format_feed_uri feed_params
-    byebug
     permitted_params = feed_params.permit(:description, :title, :uri)
+    permitted_params[:uri] = format_feed_uri permitted_params
     respond_to do |format|
       if @feed.update(permitted_params)
         format.json { render json: @feed, serializer: FeedSerializer }
@@ -66,7 +65,6 @@ class FeedController < ApplicationController
     end
 
   def format_feed_uri(params)
-    byebug
     uri = params[:uri]
     uri = uri[0, uri.rindex('?')] if uri.rindex('?')
     uri = uri[0, uri.rindex('/')] if uri[-1] == '/'
