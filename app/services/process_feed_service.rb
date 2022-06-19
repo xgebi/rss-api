@@ -4,7 +4,7 @@ class ProcessFeedService
   include HTTParty
 
   def process_articles
-    Feed.select(feed_type: 'article').distinct.pluck('uri').map do |uri|
+    Feed.all.where(user_id: current_user.id, feed_type: 'article').map do |uri|
       response = HTTParty.get(uri)
 
       next unless response.code == 200

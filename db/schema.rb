@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_18_165454) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_19_091442) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -25,6 +25,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_18_165454) do
     t.integer "itunes_duration"
     t.string "itunes_summary"
     t.string "link"
+    t.index ["guid"], name: "index_article_contents_on_guid", unique: true
   end
 
   create_table "feeds", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
