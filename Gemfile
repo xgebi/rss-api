@@ -65,7 +65,7 @@ group :test do
 end
 
 # This gem is here for the future. The plan is to make
-# gem "good_job", "~> 2.15"
+gem "good_job", "~> 2.15"
 
 gem 'rack-cors'
 gem 'active_model_serializers'

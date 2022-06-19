@@ -1,14 +1,20 @@
 class ProcessFeedService
   include HTTParty
+  attr_accessor :current_user
+
+  def initialize(user = nil)
+    super()
+    @current_user = user if user
+  end
 
   def process_articles
-    Feed.all.where(user_id: current_user.id, feed_type: 'article').distinct.pluck('uri').each do |uri|
+    Feed.all.where(user_id: @current_user.id, feed_type: 'article').distinct.pluck('uri').each do |uri|
       process_creating_articles uri
     end
   end
 
   def process_podcasts
-    Feed.select(feed_type: 'podcast').distinct.pluck('uri').map do |uri|
+    Feed.select(user_id: @current_user.id, feed_type: 'podcast').distinct.pluck('uri').map do |uri|
       process_creating_podcasts uri
     end
   end
@@ -28,11 +34,14 @@ class ProcessFeedService
   end
 
   private
-  def save_posts(article_content)
+
+  def save_posts(article_content, uri)
     # This is not final, with a lot of users there should be a priority insertion
     # and rest to be inserted through queue, depending on database architecture
     # For the time being it's ok
+    byebug
     Feed.all.where(uri:).each do |feed|
+      byebug
       post = Post.new(
         feed:,
         read: false,
@@ -44,25 +53,24 @@ class ProcessFeedService
 
   def process_creating_articles(uri)
     response = HTTParty.get(uri)
-
     return unless response.code == 200
 
     rss_doc = Nokogiri::XML(response.body)
     rss_doc.css('item').map do |item|
-      unless ArticleContent.find_by(guid: item.at_css('guid').content)
+      byebug
+      next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
-        ac = ArticleContent.new(
-          guid: item.at_css('guid').content,
-          title: item.at_css('title').content,
-          description: item.at_css('description').content,
-          content: item.at_css('content|encoded').content,
-          pub_date: item.at_css('pubDate').content,
-          link: item.at_css('link').content
-        )
-        ac.save!
+      ac = ArticleContent.new(
+        guid: item.at_css('guid').content,
+        title: item.at_css('title').content,
+        description: item.at_css('description').content,
+        content: item.at_css('content|encoded').content,
+        pub_date: item.at_css('pubDate').content,
+        link: item.at_css('link').content
+      )
+      ac.save!
 
-        save_posts ac
-      end
+      save_posts ac, uri
     end
   end
 
@@ -73,22 +81,21 @@ class ProcessFeedService
 
     rss_doc = Nokogiri::XML(response.body)
     rss_doc.css('item').map do |item|
-      unless ArticleContent.find_by(guid: item.at_css('guid').content)
+      next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
-        ac = ArticleContent.new(
-          guid: item.at_css('guid').content,
-          title: item.at_css('title').content,
-          description: item.at_css('description').content,
-          media_link: item.at_css('enclosure').content,
-          itunes_duration: item.at_css('itunes|duration').content,
-          itunes_summary: item.at_css('itunes|summary').content,
-          content: item.at_css('content|encoded').content,
-          pub_date: item.at_css('pubDate').content,
-          link: item.at_css('link').content
-        )
-        ac.save!
-        save_posts ac
-      end
+      ac = ArticleContent.new(
+        guid: item.at_css('guid').content,
+        title: item.at_css('title').content,
+        description: item.at_css('description').content,
+        media_link: item.at_css('enclosure').content,
+        itunes_duration: item.at_css('itunes|duration').content,
+        itunes_summary: item.at_css('itunes|summary').content,
+        content: item.at_css('content|encoded').content,
+        pub_date: item.at_css('pubDate').content,
+        link: item.at_css('link').content
+      )
+      ac.save!
+      save_posts ac, uri
     end
   end
 end

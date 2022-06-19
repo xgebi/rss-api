@@ -1,3 +1,4 @@
 class Post < ApplicationRecord
-  has_and_belongs_to_many :feed
+  belongs_to :feed
+  belongs_to :article_content
 end

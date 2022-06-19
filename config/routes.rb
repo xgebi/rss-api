@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     post '/current-user', to: 'users#getUserByToken'
     post '/authenticate', to: 'session#authenticate'
 
-    get '/post/refresh', to: 'post#refresh_posts'
+    get '/post/refresh/:type', to: 'post#refresh_posts'
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

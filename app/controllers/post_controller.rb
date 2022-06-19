@@ -59,15 +59,15 @@ class PostController < ApplicationController
   end
 
   def refresh_posts
-    # TODO pagination
-    pfs = ProcessFeedService.new
-    pfs.process_articles
+    pfs = ProcessFeedService.new(current_user)
+    pfs.process_articles if params[:type] == 'articles'
+    pfs.process_podcasts if params[:type] == 'podcasts'
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_post
-      @post = Post.find(params[:id])
+      @post = Post.find(params[:id]) if params[:id]
     end
 
     # Only allow a list of trusted parameters through.
