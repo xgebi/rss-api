@@ -5,9 +5,13 @@ class ProcessFeedService
 
   def process_articles
     Feed.select(feed_type: 'article').distinct.pluck("uri").map do |uri|
-      doc = Nokogiri::HTML(self.class.get(uri))
-      doc.css("item").each do |item|
-        byebug
+      response = HTTParty.get(uri)
+
+      if response.code == 200
+        rss_doc = Nokogiri::XML(response.body)
+        rss_doc.css("item").map do |item|
+          p item.at_css("title").content
+        end
       end
     end
   end
