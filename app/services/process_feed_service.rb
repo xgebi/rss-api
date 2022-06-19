@@ -39,13 +39,12 @@ class ProcessFeedService
     # This is not final, with a lot of users there should be a priority insertion
     # and rest to be inserted through queue, depending on database architecture
     # For the time being it's ok
-    byebug
     Feed.all.where(uri:).each do |feed|
-      byebug
       post = Post.new(
         feed:,
         read: false,
-        article_content:
+        article_content:,
+        user: feed.user
       )
       post.save!
     end
@@ -57,7 +56,6 @@ class ProcessFeedService
 
     rss_doc = Nokogiri::XML(response.body)
     rss_doc.css('item').map do |item|
-      byebug
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
       ac = ArticleContent.new(

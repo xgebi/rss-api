@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_19_091442) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_19_160756) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -76,11 +76,10 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_19_091442) do
   create_table "posts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "feed_id"
     t.uuid "article_content_id"
-    t.datetime "added"
-    t.datetime "updated"
     t.boolean "read"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id"
     t.index ["article_content_id"], name: "index_posts_on_article_content_id"
     t.index ["feed_id"], name: "index_posts_on_feed_id"
   end
@@ -96,4 +95,5 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_19_091442) do
   add_foreign_key "feeds", "users"
   add_foreign_key "posts", "article_contents"
   add_foreign_key "posts", "feeds"
+  add_foreign_key "posts", "users"
 end
