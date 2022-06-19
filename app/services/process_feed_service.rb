@@ -1,10 +1,8 @@
-require 'nokogiri'
-
 class ProcessFeedService
   include HTTParty
 
   def process_articles
-    Feed.all.where(user_id: current_user.id, feed_type: 'article').map do |uri|
+    Feed.all.where(user_id: current_user.id, feed_type: 'article').distinct.pluck('uri').each do |uri|
       response = HTTParty.get(uri)
 
       next unless response.code == 200
@@ -22,6 +20,8 @@ class ProcessFeedService
           link: item.at_css('link').content
         )
         ac.save!
+
+        save_posts ac
       end
     end
   end
@@ -48,7 +48,23 @@ class ProcessFeedService
           link: item.at_css('link').content
         )
         ac.save!
+        save_posts ac
       end
+    end
+  end
+
+  private
+  def save_posts(article_content)
+    # This is not final, with a lot of users there should be a priority insertion
+    # and rest to be inserted through queue, depending on database architecture
+    # For the time being it's ok
+    Feed.all.where(uri:).each do |feed|
+      post = Post.new(
+        feed:,
+        read: false,
+        article_content:
+      )
+      post.save!
     end
   end
 end
