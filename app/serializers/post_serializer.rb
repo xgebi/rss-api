@@ -1,3 +1,4 @@
 class PostSerializer < ActiveModel::Serializer
-  attributes :id, :title, :uri, :content, :read
+  attributes :id, :read, :post_type
+  has_one :article_content
 end

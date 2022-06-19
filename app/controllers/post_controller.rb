@@ -3,8 +3,10 @@ class PostController < ApplicationController
 
   # GET /post or /post.json
   def index
-    # TODO pagination
-    @posts = Post.all
+    byebug
+    # TODO pagination,pubDate is probably better than created_at, so both will be addressed after first prototype
+    @posts = Post.all.where(users: current_user.id, post_type: params[:type]).order(created_at: :desc)
+    render json: @posts, each_serializer: PostSerializer
   end
 
   # GET /post/1 or /post/1.json
