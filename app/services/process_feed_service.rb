@@ -3,53 +3,27 @@ class ProcessFeedService
 
   def process_articles
     Feed.all.where(user_id: current_user.id, feed_type: 'article').distinct.pluck('uri').each do |uri|
-      response = HTTParty.get(uri)
-
-      next unless response.code == 200
-
-      rss_doc = Nokogiri::XML(response.body)
-      rss_doc.css('item').map do |item|
-        next if ArticleContent.find_by(guid: item.at_css('guid').content)
-
-        ac = ArticleContent.new(
-          guid: item.at_css('guid').content,
-          title: item.at_css('title').content,
-          description: item.at_css('description').content,
-          content: item.at_css('content|encoded').content,
-          pub_date: item.at_css('pubDate').content,
-          link: item.at_css('link').content
-        )
-        ac.save!
-
-        save_posts ac
-      end
+      process_creating_articles uri
     end
   end
 
   def process_podcasts
     Feed.select(feed_type: 'podcast').distinct.pluck('uri').map do |uri|
-      response = HTTParty.get(uri)
+      process_creating_podcasts uri
+    end
+  end
 
-      next unless response.code == 200
+  # This is future-proofing
+  def process_all_articles
+    Feed.all.where(feed_type: 'article').distinct.pluck('uri').each do |uri|
+      process_creating_articles uri
+    end
+  end
 
-      rss_doc = Nokogiri::XML(response.body)
-      rss_doc.css('item').map do |item|
-        next if ArticleContent.find_by(guid: item.at_css('guid').content)
-
-        ac = ArticleContent.new(
-          guid: item.at_css('guid').content,
-          title: item.at_css('title').content,
-          description: item.at_css('description').content,
-          media_link: item.at_css('enclosure').content,
-          itunes_duration: item.at_css('itunes|duration').content,
-          itunes_summary: item.at_css('itunes|summary').content,
-          content: item.at_css('content|encoded').content,
-          pub_date: item.at_css('pubDate').content,
-          link: item.at_css('link').content
-        )
-        ac.save!
-        save_posts ac
-      end
+  # This is future-proofing
+  def process_all_podcasts
+    Feed.all.where(feed_type: 'podcast').distinct.pluck('uri').each do |uri|
+      process_creating_articles uri
     end
   end
 
@@ -65,6 +39,56 @@ class ProcessFeedService
         article_content:
       )
       post.save!
+    end
+  end
+
+  def process_creating_articles(uri)
+    response = HTTParty.get(uri)
+
+    return unless response.code == 200
+
+    rss_doc = Nokogiri::XML(response.body)
+    rss_doc.css('item').map do |item|
+      unless ArticleContent.find_by(guid: item.at_css('guid').content)
+
+        ac = ArticleContent.new(
+          guid: item.at_css('guid').content,
+          title: item.at_css('title').content,
+          description: item.at_css('description').content,
+          content: item.at_css('content|encoded').content,
+          pub_date: item.at_css('pubDate').content,
+          link: item.at_css('link').content
+        )
+        ac.save!
+
+        save_posts ac
+      end
+    end
+  end
+
+  def process_creating_podcasts(uri)
+    response = HTTParty.get(uri)
+
+    return unless response.code == 200
+
+    rss_doc = Nokogiri::XML(response.body)
+    rss_doc.css('item').map do |item|
+      unless ArticleContent.find_by(guid: item.at_css('guid').content)
+
+        ac = ArticleContent.new(
+          guid: item.at_css('guid').content,
+          title: item.at_css('title').content,
+          description: item.at_css('description').content,
+          media_link: item.at_css('enclosure').content,
+          itunes_duration: item.at_css('itunes|duration').content,
+          itunes_summary: item.at_css('itunes|summary').content,
+          content: item.at_css('content|encoded').content,
+          pub_date: item.at_css('pubDate').content,
+          link: item.at_css('link').content
+        )
+        ac.save!
+        save_posts ac
+      end
     end
   end
 end
