@@ -7,8 +7,9 @@ class PostController < ApplicationController
     get_posts
   end
 
-  # GET /post/1 or /post/1.json
+  # GET /post/1.json
   def show
+    render json: @post, serializer: PostSerializer, status: :ok
   end
 
   # GET /post/new
@@ -26,24 +27,21 @@ class PostController < ApplicationController
 
     respond_to do |format|
       if @post.save
-        format.html { redirect_to post_url(@post), notice: "Post was successfully created." }
-        format.json { render :show, status: :created, location: @post }
+        render json: @post, serializer: PostSerializer, status: :created
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @post.errors, status: :unprocessable_entity }
+        render json: @post.errors, status: :unprocessable_entity
       end
     end
   end
 
-  # PATCH/PUT /post/1 or /post/1.json
+  # PATCH/PUT /post/1.json
   def update
+    permitted_params = post_params.permit(:read)
     respond_to do |format|
-      if @post.update(post_params)
-        format.html { redirect_to post_url(@post), notice: "Post was successfully updated." }
-        format.json { render :show, status: :ok, location: @post }
+      if @post.update(permitted_params)
+        render json: @post, serializer: PostSerializer, status: :ok
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @post.errors, status: :unprocessable_entity }
+        render json: @post.errors, status: :unprocessable_entity
       end
     end
   end
@@ -66,15 +64,15 @@ class PostController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_post
-      @post = Post.find(params[:id]) if params[:id]
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_post
+    @post = Post.find(params[:id]) if params[:id]
+  end
 
-    # Only allow a list of trusted parameters through.
-    def post_params
-      params.fetch(:post, {})
-    end
+  # Only allow a list of trusted parameters through.
+  def post_params
+    params.fetch(:post, {})
+  end
 
   def get_posts
     @posts = Post.all.where(users: current_user.id, post_type: params[:type]).order(created_at: :desc)
