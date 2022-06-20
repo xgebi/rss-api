@@ -4,7 +4,7 @@ class PostController < ApplicationController
   # GET /post or /post.json
   def index
     # TODO pagination,pubDate is probably better than created_at, so both will be addressed after first prototype
-    get_posts
+    fetch_posts
   end
 
   # GET /post/1.json
@@ -54,7 +54,7 @@ class PostController < ApplicationController
     pfs = ProcessFeedService.new(current_user)
     pfs.process_articles if params[:type] == 'articles'
     pfs.process_podcasts if params[:type] == 'episode'
-    get_posts
+    fetch_posts
   end
 
   private
@@ -68,8 +68,8 @@ class PostController < ApplicationController
     params.fetch(:post, {})
   end
 
-  def get_posts
-    @posts = Post.all.where(users: current_user.id, post_type: params[:type]).order(created_at: :desc)
+  def fetch_posts
+    @posts = Post.all.where(users: current_user.id, post_type: params[:type]).joins(:article_content).order(pub_date: :desc)
     render json: @posts, each_serializer: PostSerializer
   end
 end

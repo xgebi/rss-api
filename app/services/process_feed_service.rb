@@ -64,7 +64,7 @@ class ProcessFeedService
         title: item.at_css('title').content,
         description: item.at_css('description').content,
         content: item.at_css('content|encoded').content,
-        pub_date: item.at_css('pubDate').content,
+        pub_date: item.at_css('pubDate').content.to_datetime,
         link: item.at_css('link').content
       )
       ac.save!
@@ -90,7 +90,7 @@ class ProcessFeedService
         itunes_duration: item.at_css('itunes|duration').content,
         itunes_summary: item.at_css('itunes|summary').content,
         content: item.at_css('content|encoded')&.content,
-        pub_date: item.at_css('pubDate').content,
+        pub_date: item.at_css('pubDate').content.to_datetime,
         link: item.at_css('link').content
       )
       ac.save!

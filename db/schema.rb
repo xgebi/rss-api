@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_19_215223) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_20_083222) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -20,11 +20,11 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_19_215223) do
     t.string "guid"
     t.text "content"
     t.string "description"
-    t.string "pub_date"
     t.string "media_link"
     t.string "itunes_duration"
     t.string "itunes_summary"
     t.string "link"
+    t.datetime "pub_date"
     t.index ["guid"], name: "index_article_contents_on_guid", unique: true
   end
 
