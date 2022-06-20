@@ -3,7 +3,6 @@ class PostController < ApplicationController
 
   # GET /post or /post.json
   def index
-    # TODO pagination,pubDate is probably better than created_at, so both will be addressed after first prototype
     fetch_posts
   end
 
@@ -35,7 +34,6 @@ class PostController < ApplicationController
   # PATCH/PUT /post/1.json
   def update
     permitted_params = post_params.permit(:read)
-    byebug
     if @post.update(permitted_params)
       render json: @post, serializer: PostSerializer, status: :ok
     else
@@ -69,6 +67,7 @@ class PostController < ApplicationController
   end
 
   def fetch_posts
+    # TODO consider pagination
     @posts = Post.all.where(users: current_user.id, post_type: params[:type]).joins(:article_content).order(pub_date: :desc)
     render json: @posts, each_serializer: PostSerializer
   end
