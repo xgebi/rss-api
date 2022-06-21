@@ -70,7 +70,7 @@ class ProcessFeedService
         guid: item.at_css('guid').content,
         title: item.at_css('title').content,
         description: item.at_css('description').content,
-        content: content,
+        content:,
         pub_date: item.at_css('pubDate').content.to_datetime,
         link: item.at_css('link').content
       )
@@ -94,14 +94,32 @@ class ProcessFeedService
       rescue
         print "content:encoded doesn't work"
       end
+      content = ''
+      begin
+        content = item.at_css('content|encoded')&.content
+      rescue
+        print "content:encoded doesn't work"
+      end
+      itunes_summary = ''
+      begin
+        itunes_summary = item.at_css('itunes|summary')&.content
+      rescue
+        print "itunes:summary doesn't work"
+      end
+      itunes_duration= ''
+      begin
+        itunes_duration = item.at_css('itunes|duration')&.content
+      rescue
+        print "itunes:duration doesn't work"
+      end
       ac = ArticleContent.new(
         guid: item.at_css('guid').content,
         title: item.at_css('title').content,
         description: item.at_css('description').content,
         media_link: item.at_css('enclosure')['url'],
-        itunes_duration: item.at_css('itunes|duration').content,
-        itunes_summary: item.at_css('itunes|summary').content,
-        content: content,
+        itunes_duration:,
+        itunes_summary:,
+        content:,
         pub_date: item.at_css('pubDate').content.to_datetime,
         link: item.at_css('link').content
       )
