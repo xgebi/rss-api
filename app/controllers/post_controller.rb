@@ -50,7 +50,7 @@ class PostController < ApplicationController
 
   def refresh_posts
     pfs = ProcessFeedService.new(current_user)
-    pfs.process_articles if params[:type] == 'articles'
+    pfs.process_articles if params[:type] == 'article'
     pfs.process_podcasts if params[:type] == 'episode'
     fetch_posts
   end
