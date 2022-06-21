@@ -59,12 +59,18 @@ class ProcessFeedService
     rss_doc = Nokogiri::XML(response.body)
     rss_doc.css('item').map do |item|
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
-
+      
+      content = ''
+      begin
+        content = item.at_css('content|encoded')&.content
+      rescue
+        print "content:encoded doesn't work"
+      end
       ac = ArticleContent.new(
         guid: item.at_css('guid').content,
         title: item.at_css('title').content,
         description: item.at_css('description').content,
-        content: item.at_css('content|encoded')&.content,
+        content: content,
         pub_date: item.at_css('pubDate').content.to_datetime,
         link: item.at_css('link').content
       )
@@ -82,6 +88,12 @@ class ProcessFeedService
     rss_doc.css('item').map do |item|
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
+      content = ''
+      begin
+        content = item.at_css('content|encoded')&.content
+      rescue
+        print "content:encoded doesn't work"
+      end
       ac = ArticleContent.new(
         guid: item.at_css('guid').content,
         title: item.at_css('title').content,
@@ -89,7 +101,7 @@ class ProcessFeedService
         media_link: item.at_css('enclosure')['url'],
         itunes_duration: item.at_css('itunes|duration').content,
         itunes_summary: item.at_css('itunes|summary').content,
-        content: item.at_css('content|encoded')&.content,
+        content: content,
         pub_date: item.at_css('pubDate').content.to_datetime,
         link: item.at_css('link').content
       )
