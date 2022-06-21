@@ -1,6 +1,6 @@
 module TokenService
   def self.encode(data)
-    iss_payload = { data: data, iss: ENV['RSS_API_URL'] }
+    iss_payload = { data:, iss: ENV['RSS_API_URL'] }
     JWT.encode iss_payload, ENV['RSS_TOKEN_PASS'], 'HS256'
 
   end

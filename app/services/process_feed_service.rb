@@ -53,6 +53,7 @@ class ProcessFeedService
 
   def process_creating_articles(uri)
     response = HTTParty.get(uri)
+
     return unless response.code == 200
 
     rss_doc = Nokogiri::XML(response.body)
@@ -63,12 +64,11 @@ class ProcessFeedService
         guid: item.at_css('guid').content,
         title: item.at_css('title').content,
         description: item.at_css('description').content,
-        content: item.at_css('content|encoded').content,
+        content: item.at_css('content|encoded')&.content,
         pub_date: item.at_css('pubDate').content.to_datetime,
         link: item.at_css('link').content
       )
       ac.save!
-
       save_posts ac, uri
     end
   end
