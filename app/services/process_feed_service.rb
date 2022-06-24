@@ -8,13 +8,13 @@ class ProcessFeedService
   end
 
   def process_articles
-    Feed.all.where(user_id: @current_user.id, feed_type: 'article').distinct.pluck('uri').each do |uri|
+    Feed.all.where(user_id: @current_user, feed_type: 'article').distinct.pluck('uri').each do |uri|
       process_creating_articles uri
     end
   end
 
   def process_podcasts
-    Feed.select(user_id: @current_user.id, feed_type: 'podcast').distinct.pluck('uri').map do |uri|
+    Feed.all.where(user_id: @current_user, feed_type: 'episode').distinct.pluck('uri').each do |uri|
       process_creating_podcasts uri
     end
   end
@@ -59,21 +59,10 @@ class ProcessFeedService
     rss_doc = Nokogiri::XML(response.body)
     rss_doc.css('item').map do |item|
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
-      
-      content = ''
-      begin
-        content = item.at_css('content|encoded')&.content
-      rescue
-        print "content:encoded doesn't work"
-      end
-      ac = ArticleContent.new(
-        guid: item.at_css('guid').content,
-        title: item.at_css('title').content,
-        description: item.at_css('description').content,
-        content:,
-        pub_date: item.at_css('pubDate').content.to_datetime,
-        link: item.at_css('link').content
-      )
+
+      ac = create_common_article item
+      ac.media_link = item.at_css('enclosure')['url'] if item.at_css('enclosure')
+
       ac.save!
       save_posts ac, uri
     end
@@ -88,44 +77,29 @@ class ProcessFeedService
     rss_doc.css('item').map do |item|
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
-      content = ''
-      begin
-        content = item.at_css('content|encoded')&.content
-      rescue
-        print "content:encoded doesn't work"
-      end
-      content = ''
-      begin
-        content = item.at_css('content|encoded')&.content
-      rescue
-        print "content:encoded doesn't work"
-      end
-      itunes_summary = ''
-      begin
-        itunes_summary = item.at_css('itunes|summary')&.content
-      rescue
-        print "itunes:summary doesn't work"
-      end
-      itunes_duration= ''
-      begin
-        itunes_duration = item.at_css('itunes|duration')&.content
-      rescue
-        print "itunes:duration doesn't work"
-      end
-      ac = ArticleContent.new(
-        guid: item.at_css('guid').content,
-        title: item.at_css('title').content,
-        description: item.at_css('description').content,
-        media_link: item.at_css('enclosure')['url'],
-        itunes_duration:,
-        itunes_summary:,
-        content:,
-        pub_date: item.at_css('pubDate').content.to_datetime,
-        link: item.at_css('link').content
-      )
+      ac = create_common_article item
+      ac.itunes_duration = item.at_css('itunes|duration').content if item.at_css('itunes|duration')
+      ac.itunes_summary = item.at_css('itunes|summary').content if item.at_css('itunes|summary')
+      ac.media_link = item.at_css('enclosure')['url'] if item.at_css('enclosure')
+      ac.save!
+
       ac.save!
       save_posts ac, uri
     end
+  end
+
+  private
+  def create_common_article(item)
+    ac = ArticleContent.new(
+      guid: item.at_css('guid').content,
+        title: item.at_css('title').content,
+        pub_date: DateTime.parse(item.at_css('pubDate').content),
+        link: item.at_css('link').content
+    )
+    ac.description = item.at_css('description').content if item.at_css('description')
+    ac.content = item.at_css('content|encoded').content if item.at_css('content|encoded')
+
+    ac
   end
 end
 
