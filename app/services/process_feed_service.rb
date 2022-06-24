@@ -60,8 +60,16 @@ class ProcessFeedService
     rss_doc.css('item').map do |item|
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
-      ac = create_common_article item
+      ac = create_common_article_rss item
       ac.media_link = item.at_css('enclosure')['url'] if item.at_css('enclosure')
+
+      ac.save!
+      save_posts ac, uri
+    end
+    rss_doc.css('entry').map do |item|
+      next if ArticleContent.find_by(guid: item.at_css('id').content)
+
+      ac = create_common_article_atom item
 
       ac.save!
       save_posts ac, uri
@@ -77,7 +85,7 @@ class ProcessFeedService
     rss_doc.css('item').map do |item|
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
-      ac = create_common_article item
+      ac = create_common_article_rss item
       ac.itunes_duration = item.at_css('itunes|duration').content if item.at_css('itunes|duration')
       ac.itunes_summary = item.at_css('itunes|summary').content if item.at_css('itunes|summary')
       ac.media_link = item.at_css('enclosure')['url'] if item.at_css('enclosure')
@@ -89,15 +97,28 @@ class ProcessFeedService
   end
 
   private
-  def create_common_article(item)
+  def create_common_article_rss(item)
     ac = ArticleContent.new(
       guid: item.at_css('guid').content,
-        title: item.at_css('title').content,
-        pub_date: DateTime.parse(item.at_css('pubDate').content),
-        link: item.at_css('link').content
+      title: item.at_css('title').content,
+      pub_date: DateTime.parse(item.at_css('pubDate').content),
+      link: item.at_css('link').content
     )
     ac.description = item.at_css('description').content if item.at_css('description')
     ac.content = item.at_css('content|encoded').content if item.at_css('content|encoded')
+
+    ac
+  end
+
+  def create_common_article_atom(item)
+    ac = ArticleContent.new(
+      id: item.at_css('id').content,
+      title: item.at_css('title').content,
+      pub_date: DateTime.parse(item.at_css('published').content),
+      link: item.at_css('link').content
+    )
+    ac.description = item.at_css('description').content if item.at_css('description')
+    ac.content = item.at_css('content').content if item.at_css('content')
 
     ac
   end
