@@ -1,11 +1,21 @@
+##
+# Class handling CRUD operations related to posts
+#
 class PostController < ApplicationController
   before_action :authenticate_user!, :set_post, only: %i[ show edit update destroy ]
 
-  # GET /post or /post.json
+  ##
+  # Function which gets all posts. Will be removed because of performance issues.
+  # Replacement will implement pagination
+  #
+  # GET /post.json
   def index
     fetch_posts
   end
 
+  ##
+  # Function which shows individual posts
+  #
   # GET /post/1.json
   def show
     render json: @post, serializer: PostSerializer, status: :ok
@@ -69,6 +79,6 @@ class PostController < ApplicationController
   def fetch_posts
     # TODO consider pagination
     @posts = Post.all.where(users: current_user.id, post_type: params[:type]).joins(:article_content).order(pub_date: :desc)
-    render json: @posts, each_serializer: PostSerializer
+    render json: @posts, each_serializer: PostListSerializer
   end
 end
