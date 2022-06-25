@@ -88,8 +88,10 @@ class ProcessFeedService
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
       ac = create_common_article_rss item
-      ac.itunes_duration = item.at_css('itunes|duration').content if item.at_css('itunes|duration')
-      ac.itunes_summary = item.at_css('itunes|summary').content if item.at_css('itunes|summary')
+      if @namespaces.index('itunes')
+        ac.itunes_duration = item.at_css('itunes|duration').content if item.at_css('itunes|duration')
+        ac.itunes_summary = item.at_css('itunes|summary').content if item.at_css('itunes|summary')
+      end
       ac.media_link = item.at_css('enclosure')['url'] if item.at_css('enclosure')
       ac.save!
 
@@ -107,8 +109,9 @@ class ProcessFeedService
       link: item.at_css('link').content
     )
     ac.description = item.at_css('description').content if item.at_css('description')
-    byebug
-    ac.content = item.at_css('content|encoded')&.content if @namespaces.index('content') && item.at_css('content|encoded')
+    if @namespaces.index('content') && item.at_css('content|encoded')
+      ac.content = item.at_css('content|encoded')&.content
+    end
 
     ac
   end
@@ -128,9 +131,7 @@ class ProcessFeedService
 
   def map_namespace(doc)
     doc.namespaces.keys.map do |key|
-      if key.index(':')
-        key[key.index(':') + 1, key.length]
-      end
+      key[key.index(':') + 1, key.length] if key.index(':')
     end
   end
 end
