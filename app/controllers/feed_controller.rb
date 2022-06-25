@@ -35,9 +35,9 @@ class FeedController < ApplicationController
     permitted_params[:uri] = format_feed_uri permitted_params
 
     if @feed.update(permitted_params)
-      format.json { render json: @feed, serializer: FeedSerializer }
+      render json: @feed, serializer: FeedSerializer
     else
-      format.json { render json: @feed.errors, status: :unprocessable_entity }
+      render json: @feed.errors, status: :unprocessable_entity
     end
   end
 
@@ -61,8 +61,19 @@ class FeedController < ApplicationController
 
   def format_feed_uri(params)
     uri = params[:uri]
-    uri = uri[0, uri.rindex('?')] if uri.rindex('?')
+    uri = strip_tracking_params uri
     uri = uri[0, uri.rindex('/')] if uri[-1] == '/'
     uri
+  end
+
+  def strip_tracking_params(uri)
+    result = []
+    uri[uri.index('?') + 1, uri.length].split('&').each do |param|
+      unless param.index('utm')
+        result.push(param)
+      end
+    end
+
+    uri[0, uri.rindex('?') + 1] + result.join('&')
   end
 end

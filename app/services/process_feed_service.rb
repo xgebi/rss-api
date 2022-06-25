@@ -57,6 +57,7 @@ class ProcessFeedService
     return unless response.code == 200
 
     rss_doc = Nokogiri::XML(response.body)
+    @namespaces = map_namespace rss_doc
     rss_doc.css('item').map do |item|
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
@@ -82,6 +83,7 @@ class ProcessFeedService
     return unless response.code == 200
 
     rss_doc = Nokogiri::XML(response.body)
+    @namespaces = map_namespace rss_doc
     rss_doc.css('item').map do |item|
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
@@ -105,14 +107,15 @@ class ProcessFeedService
       link: item.at_css('link').content
     )
     ac.description = item.at_css('description').content if item.at_css('description')
-    ac.content = item.at_css('content|encoded').content if item.at_css('content|encoded')
+    byebug
+    ac.content = item.at_css('content|encoded')&.content if @namespaces.index('content') && item.at_css('content|encoded')
 
     ac
   end
 
   def create_common_article_atom(item)
     ac = ArticleContent.new(
-      id: item.at_css('id').content,
+      guid: item.at_css('id').content,
       title: item.at_css('title').content,
       pub_date: DateTime.parse(item.at_css('published').content),
       link: item.at_css('link').content
@@ -121,6 +124,14 @@ class ProcessFeedService
     ac.content = item.at_css('content').content if item.at_css('content')
 
     ac
+  end
+
+  def map_namespace(doc)
+    doc.namespaces.keys.map do |key|
+      if key.index(':')
+        key[key.index(':') + 1, key.length]
+      end
+    end
   end
 end
 
