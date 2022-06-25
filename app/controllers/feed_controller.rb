@@ -67,13 +67,17 @@ class FeedController < ApplicationController
   end
 
   def strip_tracking_params(uri)
-    result = []
-    uri[uri.index('?') + 1, uri.length].split('&').each do |param|
-      unless param.index('utm')
-        result.push(param)
+    if uri.rindex('?')
+      result = []
+      uri[uri.index('?') + 1, uri.length].split('&').each do |param|
+        unless param.index('utm')
+          result.push(param)
+        end
       end
-    end
 
-    uri[0, uri.rindex('?') + 1] + result.join('&')
+      uri[0, uri.rindex('?') + 1] + result.join('&')
+    else
+      uri
+    end
   end
 end
