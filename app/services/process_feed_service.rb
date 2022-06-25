@@ -106,8 +106,8 @@ class ProcessFeedService
       guid: item.at_css('guid').content,
       title: item.at_css('title').content,
       pub_date: DateTime.parse(item.at_css('pubDate').content),
-      link: item.at_css('link').content
     )
+    ac.link = item.at_css('link').content if item.at_css('link')
     ac.description = item.at_css('description').content if item.at_css('description')
     if @namespaces.index('content') && item.at_css('content|encoded')
       ac.content = item.at_css('content|encoded')&.content
@@ -121,8 +121,8 @@ class ProcessFeedService
       guid: item.at_css('id').content,
       title: item.at_css('title').content,
       pub_date: DateTime.parse(item.at_css('published').content),
-      link: item.at_css('link').content
     )
+    ac.link = item.at_css('link').content if item.at_css('link')
     ac.description = item.at_css('description').content if item.at_css('description')
     ac.content = item.at_css('content').content if item.at_css('content')
 
