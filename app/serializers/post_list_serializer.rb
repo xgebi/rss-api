@@ -8,6 +8,6 @@ class PostListSerializer < ActiveModel::Serializer
   end
 
   class ArticleContentSerializer < ActiveModel::Serializer
-    attributes :title, :itunes_duration, :pub_date
+    attributes :title, :itunes_duration, :pub_date, :media_type
   end
 end

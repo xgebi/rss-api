@@ -62,7 +62,12 @@ class ProcessFeedService
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
       ac = create_common_article_rss item
-      ac.media_link = item.at_css('enclosure')['url'] if item.at_css('enclosure')
+      if item.at_css('enclosure')
+        ac.media_link = item.at_css('enclosure')['url']
+        media_type = item.at_css('enclosure')['type']
+        media_type = media_type[0, media_type.index('/')] if media_type.index('/')
+        ac.media_type = media_type
+      end
 
       ac.save!
       save_posts ac, uri
