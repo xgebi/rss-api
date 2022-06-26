@@ -1,3 +1,6 @@
+##
+# Service to encapsulate processing RSS and Atom feeds for articles and podcasts
+#
 class ProcessFeedService
   include HTTParty
   attr_accessor :current_user
