@@ -101,7 +101,10 @@ class ProcessFeedService
         ac = transform_duration(ac) if item.at_css('itunes|duration')
         ac.itunes_summary = item.at_css('itunes|summary').content if item.at_css('itunes|summary')
       end
-      ac.media_link = item.at_css('enclosure')['url'] if item.at_css('enclosure')
+      if item.at_css('enclosure')
+        ac.media_link = item.at_css('enclosure')['url']
+        ac.media_type = item.at_css('enclosure')['url'][0, item.at_css('enclosure')['url'].index('/')]
+      end
       ac.save!
 
       ac.save!
