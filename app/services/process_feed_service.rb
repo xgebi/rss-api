@@ -97,6 +97,7 @@ class ProcessFeedService
 
       ac = create_common_article_rss item
       if @namespaces.index('itunes')
+        ac.itunes_duration = item.at_css('itunes|duration').content if item.at_css('itunes|duration')
         ac = transform_duration(ac) if item.at_css('itunes|duration')
         ac.itunes_summary = item.at_css('itunes|summary').content if item.at_css('itunes|summary')
       end
