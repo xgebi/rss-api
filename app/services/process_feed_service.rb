@@ -103,7 +103,7 @@ class ProcessFeedService
       end
       if item.at_css('enclosure')
         ac.media_link = item.at_css('enclosure')['url']
-        ac.media_type = item.at_css('enclosure')['url'][0, item.at_css('enclosure')['url'].index('/')]
+        ac.media_type = item.at_css('enclosure')['type'][0, item.at_css('enclosure')['type'].index('/')]
       end
       ac.save!
 
