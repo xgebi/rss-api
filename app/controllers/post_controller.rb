@@ -79,7 +79,9 @@ class PostController < ApplicationController
   def fetch_posts
     page = params[:page]
     page ||= 1
-    @posts = Post.all.where(users: current_user.id, post_type: params[:type]).joins(:article_content).order(pub_date: :desc).page(page).per(30)
+    size = params[:size]
+    size ||= 30
+    @posts = Post.all.where(users: current_user.id, post_type: params[:type]).joins(:article_content).order(pub_date: :desc).page(page).per(size)
     render json: @posts, each_serializer: PostListSerializer
   end
 end
