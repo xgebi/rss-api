@@ -76,4 +76,4 @@ gem 'httparty'
 gem 'nokogiri'
 gem "validate_url"
 
-# TODO gem 'will_paginate', '~> 3.3'
+gem 'kaminari'
