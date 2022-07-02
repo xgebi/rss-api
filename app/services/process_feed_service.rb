@@ -11,15 +11,19 @@ class ProcessFeedService
   end
 
   def process_articles
+    threads = []
     Feed.all.where(user_id: @current_user, feed_type: 'article').each do |feed|
-      process_creating_articles feed
+      threads << Thread.new { process_creating_articles feed }
     end
+    threads.each(&:join)
   end
 
   def process_podcasts
-    Feed.all.where(user_id: @current_user, feed_type: 'episode').each do |uri|
-      process_creating_podcasts uri
+    threads = []
+    Feed.all.where(user_id: @current_user, feed_type: 'episode').each do |feed|
+      threads << Thread.new { process_creating_podcasts feed }
     end
+    threads.each(&:join)
   end
 
   # This is future-proofing
