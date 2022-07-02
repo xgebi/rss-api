@@ -14,6 +14,7 @@ module Rss
     config.session_store :cookie_store, key: '_interslice_session'
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use config.session_store, config.session_options
+    config.checkout_timeout = 60
 
     # Configuration for the application, engines, and railties goes here.
     #

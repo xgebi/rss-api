@@ -13,7 +13,8 @@ class ProcessFeedService
   def process_articles
     threads = []
     Feed.all.where(user_id: @current_user, feed_type: 'article').each do |feed|
-      threads << Thread.new { process_creating_articles feed }
+      process_creating_articles feed
+      # threads << Thread.new { process_creating_articles feed }
     end
     threads.each(&:join)
   end
@@ -21,7 +22,8 @@ class ProcessFeedService
   def process_podcasts
     threads = []
     Feed.all.where(user_id: @current_user, feed_type: 'episode').each do |feed|
-      threads << Thread.new { process_creating_podcasts feed }
+      # threads << Thread.new { process_creating_podcasts feed }
+      process_creating_podcasts feed
     end
     threads.each(&:join)
   end
@@ -130,7 +132,7 @@ class ProcessFeedService
     )
     ac.link = item.at_css('link').content if item.at_css('link')
     ac.description = item.at_css('description').content if item.at_css('description')
-    if @namespaces.index('content') && item.at_css('content|encoded')
+    if !@namespaces.index('content').nil? && item.at_css('content|encoded')
       ac.content = item.at_css('content|encoded')&.content
     end
 
@@ -180,7 +182,7 @@ class ProcessFeedService
     last_build_date ||= DateTime.parse(document.at_css('updated').content) if document.at_css('updated')
     last_build_date ||= DateTime.now
     feed.last_checked_date = DateTime.now
-    if !feed.last_build_date.nil? && feed.last_build_date < last_build_date
+    if feed.last_build_date.nil? || feed.last_build_date < last_build_date
       feed.last_build_date = last_build_date
       feed.save!
       return true
