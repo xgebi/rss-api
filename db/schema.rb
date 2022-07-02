@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_26_111157) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_02_080740) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -41,6 +41,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_26_111157) do
     t.string "feed_type", default: "article"
     t.string "update_period"
     t.integer "update_frequency"
+    t.datetime "last_build_date"
+    t.datetime "last_checked_date"
     t.index ["user_id"], name: "index_feeds_on_user_id"
   end
 

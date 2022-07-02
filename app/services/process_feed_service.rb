@@ -11,13 +11,13 @@ class ProcessFeedService
   end
 
   def process_articles
-    Feed.all.where(user_id: @current_user, feed_type: 'article').distinct.pluck('uri').each do |uri|
-      process_creating_articles uri
+    Feed.all.where(user_id: @current_user, feed_type: 'article').each do |feed|
+      process_creating_articles feed
     end
   end
 
   def process_podcasts
-    Feed.all.where(user_id: @current_user, feed_type: 'episode').distinct.pluck('uri').each do |uri|
+    Feed.all.where(user_id: @current_user, feed_type: 'episode').each do |uri|
       process_creating_podcasts uri
     end
   end
@@ -54,13 +54,16 @@ class ProcessFeedService
     end
   end
 
-  def process_creating_articles(uri)
-    response = HTTParty.get(uri)
+  def process_creating_articles(feed)
+    response = HTTParty.get(feed.uri)
 
     return unless response.code == 200
 
     rss_doc = Nokogiri::XML(response.body)
+    return unless update_feed?(feed, rss_doc)
+
     @namespaces = map_namespace rss_doc
+
     rss_doc.css('item').map do |item|
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
 
@@ -73,7 +76,7 @@ class ProcessFeedService
       end
 
       ac.save!
-      save_posts ac, uri
+      save_posts ac, feed.uri
     end
     rss_doc.css('entry').map do |item|
       next if ArticleContent.find_by(guid: item.at_css('id').content)
@@ -85,12 +88,14 @@ class ProcessFeedService
     end
   end
 
-  def process_creating_podcasts(uri)
-    response = HTTParty.get(uri)
+  def process_creating_podcasts(feed)
+    response = HTTParty.get(feed.uri)
 
     return unless response.code == 200
 
     rss_doc = Nokogiri::XML(response.body)
+    return unless update_feed?(feed, rss_doc)
+
     @namespaces = map_namespace rss_doc
     rss_doc.css('item').map do |item|
       next if ArticleContent.find_by(guid: item.at_css('guid').content)
@@ -108,7 +113,7 @@ class ProcessFeedService
       ac.save!
 
       ac.save!
-      save_posts ac, uri
+      save_posts ac, feed.uri
     end
   end
 
@@ -164,6 +169,20 @@ class ProcessFeedService
       ac.itunes_duration = "#{hours}:#{minutes}:#{seconds}"
     end
     ac
+  end
+
+  def update_feed?(feed, document)
+    last_build_date = DateTime.parse(document.at_css('lastBuildDate').content) if document.at_css('lastBuildDate')
+    last_build_date ||= DateTime.parse(document.at_css('updated').content) if document.at_css('updated')
+    last_build_date ||= DateTime.now
+    feed.last_checked_date = DateTime.now
+    if !feed.last_build_date.nil? && feed.last_build_date < last_build_date
+      feed.last_build_date = last_build_date
+      feed.save!
+      return true
+    end
+    feed.save!
+    false
   end
 end
 
