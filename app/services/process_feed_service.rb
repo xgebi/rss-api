@@ -90,7 +90,7 @@ class ProcessFeedService
       ac = create_common_article_atom item
 
       ac.save!
-      save_posts ac, uri
+      save_posts ac, feed.uri
     end
   end
 
