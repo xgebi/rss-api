@@ -13,36 +13,51 @@ class ProcessFeedService
   def process_articles
     threads = []
     Feed.all.where(user_id: @current_user, feed_type: 'article').each do |feed|
-      process_creating_articles feed
-      # threads << Thread.new { process_creating_articles feed }
+      threads << Thread.new { Thread.current[:output] = fetch_feed_file feed }
     end
-    threads.each(&:join)
+
+    threads.each do |t|
+      t.join
+      process_creating_articles t[:output][:feed], t[:output][:doc] if t[:output][:success]
+    end
+
   end
 
   def process_podcasts
     threads = []
     Feed.all.where(user_id: @current_user, feed_type: 'episode').each do |feed|
-      # threads << Thread.new { process_creating_podcasts feed }
-      process_creating_podcasts feed
+      threads << Thread.new { Thread.current[:output] = fetch_feed_file feed }
     end
-    threads.each(&:join)
+
+    threads.each do |t|
+      t.join
+      process_creating_podcasts t[:output][:feed], t[:output][:doc] if t[:output][:success]
+    end
   end
 
   # This is future-proofing
   def process_all_articles
     Feed.all.where(feed_type: 'article').distinct.pluck('uri').each do |uri|
-      process_creating_articles uri
+      # process_creating_articles uri
     end
   end
 
   # This is future-proofing
   def process_all_podcasts
     Feed.all.where(feed_type: 'podcast').distinct.pluck('uri').each do |uri|
-      process_creating_articles uri
+      # process_creating_articles uri
     end
   end
 
   private
+
+  def fetch_feed_file(feed)
+    response = HTTParty.get(feed.uri)
+
+    return { feed:, success: false } unless response.code == 200
+    
+    { feed:, success: true, doc: response.body }
+  end
 
   def save_posts(article_content, uri)
     # This is not final, with a lot of users there should be a priority insertion
@@ -60,12 +75,8 @@ class ProcessFeedService
     end
   end
 
-  def process_creating_articles(feed)
-    response = HTTParty.get(feed.uri)
-
-    return unless response.code == 200
-
-    rss_doc = Nokogiri::XML(response.body)
+  def process_creating_articles(feed, body)
+    rss_doc = Nokogiri::XML(body)
     return unless update_feed?(feed, rss_doc)
 
     @namespaces = map_namespace rss_doc
@@ -94,12 +105,8 @@ class ProcessFeedService
     end
   end
 
-  def process_creating_podcasts(feed)
-    response = HTTParty.get(feed.uri)
-
-    return unless response.code == 200
-
-    rss_doc = Nokogiri::XML(response.body)
+  def process_creating_podcasts(feed, body)
+    rss_doc = Nokogiri::XML(body)
     return unless update_feed?(feed, rss_doc)
 
     @namespaces = map_namespace rss_doc
