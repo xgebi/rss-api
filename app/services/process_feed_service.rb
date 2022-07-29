@@ -12,27 +12,39 @@ class ProcessFeedService
 
   def process_articles
     threads = []
-    Feed.all.where(user_id: @current_user, feed_type: 'article').each do |feed|
-      threads << Thread.new { Thread.current[:output] = fetch_feed_file feed }
+    queue = Thread::Queue.new
+    feeds = Feed.all.where(user_id: @current_user, feed_type: 'article')
+    feeds.each do |feed|
+      threads << Thread.new { queue.push fetch_feed_file feed }
     end
 
-    threads.each do |t|
-      t.join
-      process_creating_articles t[:output][:feed], t[:output][:doc] if t[:output][:success]
+    i = 0
+    while i < feeds.length
+      result = queue.pop
+      process_creating_articles result[:feed], result[:doc] if result[:success]
+      i += 1
     end
+    queue.close
+    threads.each(&:join)
 
   end
 
   def process_podcasts
     threads = []
-    Feed.all.where(user_id: @current_user, feed_type: 'episode').each do |feed|
-      threads << Thread.new { Thread.current[:output] = fetch_feed_file feed }
+    queue = Thread::Queue.new
+    feeds = Feed.all.where(user_id: @current_user, feed_type: 'episode')
+    feeds.each do |feed|
+      threads << Thread.new { queue.push fetch_feed_file feed }
     end
 
-    threads.each do |t|
-      t.join
-      process_creating_podcasts t[:output][:feed], t[:output][:doc] if t[:output][:success]
+    i = 0
+    while i < feeds.length
+      result = queue.pop
+      process_creating_podcasts result[:feed], result[:doc] if result[:success]
+      i += 1
     end
+    queue.close
+    threads.each(&:join)
   end
 
   # This is future-proofing
