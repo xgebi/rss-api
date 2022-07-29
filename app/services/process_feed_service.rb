@@ -2,7 +2,7 @@
 # Service to encapsulate processing RSS and Atom feeds for articles and podcasts
 #
 class ProcessFeedService
-  include HTTParty
+  include Curl
   attr_accessor :current_user
 
   def initialize(user = nil)
@@ -64,11 +64,13 @@ class ProcessFeedService
   private
 
   def fetch_feed_file(feed)
-    response = HTTParty.get(feed.uri)
-
-    return { feed:, success: false } unless response.code == 200
-    
-    { feed:, success: true, doc: response.body }
+    response = Curl.get(feed.uri)
+    if response.response_code == 200
+      { feed:, success: true, doc: response.body }
+    else
+      puts feed.uri
+      { feed:, success: false }
+    end
   end
 
   def save_posts(article_content, uri)

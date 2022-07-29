@@ -72,7 +72,8 @@ gem 'active_model_serializers'
 
 gem 'jwt'
 
-gem 'httparty'
+#gem 'httparty'
+gem 'curb', '1.0.1'
 gem 'nokogiri'
 gem 'validate_url'
 
