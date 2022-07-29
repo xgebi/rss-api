@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_02_080740) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_08_174147) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -85,6 +85,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_02_080740) do
     t.datetime "updated_at", null: false
     t.uuid "user_id"
     t.string "post_type"
+    t.bigint "current_time"
     t.index ["article_content_id"], name: "index_posts_on_article_content_id"
     t.index ["feed_id"], name: "index_posts_on_feed_id"
   end

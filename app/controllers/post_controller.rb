@@ -43,7 +43,7 @@ class PostController < ApplicationController
 
   # PATCH/PUT /post/1.json
   def update
-    permitted_params = post_params.permit(:read)
+    permitted_params = post_params.permit(:read, :current_time)
     if @post.update(permitted_params)
       render json: @post, serializer: PostSerializer, status: :ok
     else

@@ -144,9 +144,11 @@ class ProcessFeedService
 
   private
   def create_common_article_rss(item)
+    title = 'Untitled'
+    title ||= item.at_css('title').content if item.at_css('title')
     ac = ArticleContent.new(
       guid: item.at_css('guid').content,
-      title: item.at_css('title').content,
+      title: title,
       pub_date: DateTime.parse(item.at_css('pubDate').content),
     )
     ac.link = item.at_css('link').content if item.at_css('link')
@@ -159,9 +161,11 @@ class ProcessFeedService
   end
 
   def create_common_article_atom(item)
+    title = 'Untitled'
+    title ||= item.at_css('title').content if item.at_css('title')
     ac = ArticleContent.new(
       guid: item.at_css('id').content,
-      title: item.at_css('title').content,
+      title: title,
       pub_date: DateTime.parse(item.at_css('published').content),
     )
     ac.link = item.at_css('link').content if item.at_css('link')
