@@ -61,9 +61,7 @@ class FeedController < ApplicationController
 
   def format_feed_uri(params)
     uri = params[:uri]
-    uri = strip_tracking_params uri
-    uri = uri[0, uri.rindex('/')] if uri[-1] == '/'
-    uri
+    strip_tracking_params uri
   end
 
   def strip_tracking_params(uri)
