@@ -165,10 +165,12 @@ class ProcessFeedService
   def create_common_article_atom(item)
     title = item.at_css('title').content if item.at_css('title')
     title ||= 'Untitled'
+    pub_date = DateTime.parse(item.at_css('published').content)
+    pub_date ||= DateTime.parse(item.at_css('updated').content)
     ac = ArticleContent.new(
       guid: item.at_css('id').content,
       title:,
-      pub_date: DateTime.parse(item.at_css('published').content),
+      pub_date:,
     )
     ac.link = item.at_css('link').content if item.at_css('link')
     ac.description = item.at_css('description').content if item.at_css('description')
