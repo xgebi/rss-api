@@ -157,7 +157,7 @@ class ProcessFeedService
     title = item.at_css('title').content if item.at_css('title')
     title ||= 'Untitled'
     pub_date = DateTime.parse(item.at_css('pubDate').content) if item.at_css('pubDate')
-    pub_date ||= DateTime.parse(item.at_css('dc:date').content)
+    pub_date ||= DateTime.parse(item.at_css('dc:date').content) if item.at_css('dc:date')
     ac = ArticleContent.new(
       guid: item.at_css('guid').content,
       title:,
