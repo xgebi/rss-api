@@ -156,10 +156,12 @@ class ProcessFeedService
   def create_common_article_rss(item)
     title = item.at_css('title').content if item.at_css('title')
     title ||= 'Untitled'
+    pub_date = DateTime.parse(item.at_css('pubDate').content) if item.at_css('pubDate')
+    pub_date ||= DateTime.parse(item.at_css('dc:date').content)
     ac = ArticleContent.new(
       guid: item.at_css('guid').content,
       title:,
-      pub_date: DateTime.parse(item.at_css('pubDate').content),
+      pub_date:
     )
     ac.link = item.at_css('link').content if item.at_css('link')
     ac.description = item.at_css('description').content if item.at_css('description')
@@ -179,7 +181,7 @@ class ProcessFeedService
     ac = ArticleContent.new(
       guid: item.at_css('id').content,
       title:,
-      pub_date:,
+      pub_date:
     )
     ac.link = item.at_css('link').content if item.at_css('link')
     ac.description = item.at_css('description').content if item.at_css('description')
