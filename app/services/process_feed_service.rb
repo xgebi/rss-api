@@ -44,7 +44,11 @@ class ProcessFeedService
     i = 0
     while i < feeds.length
       result = queue.pop
-      process_creating_podcasts result[:feed], result[:doc] if result[:success]
+      if result[:success]
+        process_creating_podcasts result[:feed], result[:doc]
+        result[:feed].last_successful_update = DateTime.now
+        result[:feed].save!
+      end
       i += 1
     end
     queue.close
