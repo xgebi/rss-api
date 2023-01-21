@@ -72,10 +72,15 @@ class ProcessFeedService
   private
 
   def fetch_feed_file(feed)
-    response = Curl.get(feed.uri)
-    if response.response_code == 200
-      { feed:, success: true, doc: response.body }
-    else
+    begin
+      response = Curl.get(feed.uri)
+      if response.response_code == 200
+        { feed:, success: true, doc: response.body }
+      else
+        puts feed.uri
+        { feed:, success: false }
+      end
+    rescue Curl::Error => e
       puts feed.uri
       { feed:, success: false }
     end
